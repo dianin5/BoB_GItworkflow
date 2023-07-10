@@ -1,0 +1,32 @@
+name: Python Version Info
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    name: Run Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python version and write to file
+        run: |
+          VERSION_INFO=$(python -c "import sys; print(sys.version)")
+          echo $VERSION_INFO
+          echo $VERSION_INFO > "python_${{ matrix.python-version }}_version.txt"
+      
+      - name: Upload Python version info as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: python_${{ matrix.python-version }}_version_info
+          path: ./python_${{ matrix.python-version }}_version.txt
